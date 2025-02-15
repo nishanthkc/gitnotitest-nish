@@ -82,8 +82,14 @@ jobs:
           to-email: ${{ secrets.RECIPIENT_EMAIL }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: Test Email
-          body: This is a test email sent from GitHub Actions.
+          subject: "New Commit Detected in ${{ secrets.TARGET_REPO }}"
+          body: |
+            A new commit has been pushed to ${{ secrets.TARGET_REPO }}.
+            
+            Repository: https://github.com/nchurchm/gitnotitest
+            Commit SHA: "none"
+            View Commit: https://github.com/nchurchm/gitnotitest/commit/none
+
           html: |
             <h1>This is a test email</h1>
             <p>Test Paragraph</p>
