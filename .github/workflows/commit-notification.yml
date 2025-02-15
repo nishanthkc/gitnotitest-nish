@@ -1,182 +1,182 @@
-name: Monitor Public Repository for New Commits
+# name: Monitor Public Repository for New Commits
 
-on:
-  schedule:
-    - cron: '*/1 * * * *'  # Runs every 10 minutes
-  workflow_dispatch:  # Allows manual execution
+# on:
+#   schedule:
+#     - cron: '*/1 * * * *'  # Runs every 10 minutes
+#   workflow_dispatch:  # Allows manual execution
 
-jobs:
-  check_commits:
-    runs-on: ubuntu-latest
+# jobs:
+#   check_commits:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository (Your Fork)
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+#     steps:
+#       - name: Checkout Repository (Your Fork)
+#         uses: actions/checkout@v3
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Restore Latest Commit from File
-        id: restore_commit
-        run: |
-          TRACKING_FILE="latest_commit.txt"
+#       - name: Restore Latest Commit from File
+#         id: restore_commit
+#         run: |
+#           TRACKING_FILE="latest_commit.txt"
 
-          # Ensure the file exists
-          if [ ! -f "$TRACKING_FILE" ]; then
-            echo "No tracking file found. Creating latest_commit.txt..."
-            echo "" > "$TRACKING_FILE"
-          fi
+#           # Ensure the file exists
+#           if [ ! -f "$TRACKING_FILE" ]; then
+#             echo "No tracking file found. Creating latest_commit.txt..."
+#             echo "" > "$TRACKING_FILE"
+#           fi
 
-          PREV_COMMIT=$(cat "$TRACKING_FILE")
-          echo "Previous commit: $PREV_COMMIT"
-          echo "PREV_COMMIT=$PREV_COMMIT" >> $GITHUB_ENV
+#           PREV_COMMIT=$(cat "$TRACKING_FILE")
+#           echo "Previous commit: $PREV_COMMIT"
+#           echo "PREV_COMMIT=$PREV_COMMIT" >> $GITHUB_ENV
 
 
 
-      - name: Fetch Latest Commit from Public Repo
-        id: fetch_commit
-        run: |
-          TARGET_REPO="nchurchm/gitnotitest"  # Replace with the actual public repo owner/name
-          BRANCH="main"  # Change if needed
-          API_URL="https://api.github.com/repos/$TARGET_REPO/commits?sha=$BRANCH"
+#       - name: Fetch Latest Commit from Public Repo
+#         id: fetch_commit
+#         run: |
+#           TARGET_REPO="nchurchm/gitnotitest"  # Replace with the actual public repo owner/name
+#           BRANCH="main"  # Change if needed
+#           API_URL="https://api.github.com/repos/$TARGET_REPO/commits?sha=$BRANCH"
           
-          LATEST_COMMIT=$(curl -s $API_URL | jq -r '.[0].sha')
+#           LATEST_COMMIT=$(curl -s $API_URL | jq -r '.[0].sha')
 
-          echo "Latest commit: $LATEST_COMMIT"
-          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
+#           echo "Latest commit: $LATEST_COMMIT"
+#           echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
           
 
-      # - name: Save Latest Commit to Artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: latest_commit
-      #     path: latest_commit.txt
-      #     retention-days: 7  # Keeps it for 7 days
+#       # - name: Save Latest Commit to Artifacts
+#       #   uses: actions/upload-artifact@v4
+#       #   with:
+#       #     name: latest_commit
+#       #     path: latest_commit.txt
+#       #     retention-days: 7  # Keeps it for 7 days
 
-      # - name: Check for New Commit
-      #   id: check_new_commit
-      #   run: |
-      #     TRACKING_FILE="latest_commit.txt"
+#       # - name: Check for New Commit
+#       #   id: check_new_commit
+#       #   run: |
+#       #     TRACKING_FILE="latest_commit.txt"
 
-      #     # Fetch previous commit if exists
-      #     if [ -f "$TRACKING_FILE" ]; then
-      #       PREV_COMMIT=$(cat $TRACKING_FILE)
-      #     else
-      #       PREV_COMMIT=""
-      #     fi
+#       #     # Fetch previous commit if exists
+#       #     if [ -f "$TRACKING_FILE" ]; then
+#       #       PREV_COMMIT=$(cat $TRACKING_FILE)
+#       #     else
+#       #       PREV_COMMIT=""
+#       #     fi
 
-      #     echo "Previous commit: $PREV_COMMIT"
-      #     echo "Current commit: $LATEST_COMMIT"
+#       #     echo "Previous commit: $PREV_COMMIT"
+#       #     echo "Current commit: $LATEST_COMMIT"
 
-      #     if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" ]]; then
-      #       echo "NEW_COMMIT=true" >> $GITHUB_ENV
-      #       echo "$LATEST_COMMIT" > $TRACKING_FILE
-      #     else
-      #       echo "NEW_COMMIT=false" >> $GITHUB_ENV
-      #     fi
-      - name: Check for New Commit
-        id: check_new_commit
-        run: |
-          if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" && -n "$LATEST_COMMIT" ]]; then
-            echo "NEW_COMMIT=true" >> $GITHUB_ENV
-            echo "$LATEST_COMMIT" > latest_commit.txt
-          else
-            echo "NEW_COMMIT=false" >> $GITHUB_ENV
-          fi
+#       #     if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" ]]; then
+#       #       echo "NEW_COMMIT=true" >> $GITHUB_ENV
+#       #       echo "$LATEST_COMMIT" > $TRACKING_FILE
+#       #     else
+#       #       echo "NEW_COMMIT=false" >> $GITHUB_ENV
+#       #     fi
+#       - name: Check for New Commit
+#         id: check_new_commit
+#         run: |
+#           if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" && -n "$LATEST_COMMIT" ]]; then
+#             echo "NEW_COMMIT=true" >> $GITHUB_ENV
+#             echo "$LATEST_COMMIT" > latest_commit.txt
+#           else
+#             echo "NEW_COMMIT=false" >> $GITHUB_ENV
+#           fi
 
-        # USE THIS 
-      # - name: Check for New Commit
-      #   id: check_new_commit
-      #   run: |
-      #     TRACKING_FILE="latest_commit.txt"
+#         # USE THIS 
+#       # - name: Check for New Commit
+#       #   id: check_new_commit
+#       #   run: |
+#       #     TRACKING_FILE="latest_commit.txt"
       
-      #     # Ensure file exists
-      #     if [ ! -f "$TRACKING_FILE" ]; then
-      #       echo "Creating latest_commit.txt..."
-      #       echo "" > $TRACKING_FILE
-      #     fi
+#       #     # Ensure file exists
+#       #     if [ ! -f "$TRACKING_FILE" ]; then
+#       #       echo "Creating latest_commit.txt..."
+#       #       echo "" > $TRACKING_FILE
+#       #     fi
       
-      #     # Fetch previous commit if exists
-      #     PREV_COMMIT=$(cat $TRACKING_FILE)
+#       #     # Fetch previous commit if exists
+#       #     PREV_COMMIT=$(cat $TRACKING_FILE)
       
-      #     echo "Previous commit: $PREV_COMMIT"
-      #     echo "Current commit: $LATEST_COMMIT"
+#       #     echo "Previous commit: $PREV_COMMIT"
+#       #     echo "Current commit: $LATEST_COMMIT"
       
-      #     if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" && -n "$LATEST_COMMIT" ]]; then
-      #       echo "NEW_COMMIT=true" >> $GITHUB_ENV
-      #       echo "$LATEST_COMMIT" > $TRACKING_FILE
-      #     else
-      #       echo "NEW_COMMIT=false" >> $GITHUB_ENV
-      #     fi
+#       #     if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" && -n "$LATEST_COMMIT" ]]; then
+#       #       echo "NEW_COMMIT=true" >> $GITHUB_ENV
+#       #       echo "$LATEST_COMMIT" > $TRACKING_FILE
+#       #     else
+#       #       echo "NEW_COMMIT=false" >> $GITHUB_ENV
+#       #     fi
 
-      # - name: Send Email Notification (if new commit)
-      #   if: env.NEW_COMMIT == 'true'
-      #   uses: dawidd6/action-send-mail@v3
-      #   with:
-      #     server_address: ${{ secrets.SMTP_SERVER }}
-      #     server_port: ${{ secrets.SMTP_PORT }}
-      #     username: ${{ secrets.EMAIL_USERNAME }}
-      #     password: ${{ secrets.EMAIL_PASSWORD }}
-      #     subject: "New Commit in Public Repository"
-      #     body: |
-      #       A new commit has been pushed to the public repository.
+#       # - name: Send Email Notification (if new commit)
+#       #   if: env.NEW_COMMIT == 'true'
+#       #   uses: dawidd6/action-send-mail@v3
+#       #   with:
+#       #     server_address: ${{ secrets.SMTP_SERVER }}
+#       #     server_port: ${{ secrets.SMTP_PORT }}
+#       #     username: ${{ secrets.EMAIL_USERNAME }}
+#       #     password: ${{ secrets.EMAIL_PASSWORD }}
+#       #     subject: "New Commit in Public Repository"
+#       #     body: |
+#       #       A new commit has been pushed to the public repository.
             
-      #       Repository: owner/repository
-      #       Commit SHA: ${{ env.LATEST_COMMIT }}
-      #       View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
-      #     to: ${{ secrets.RECIPIENT_EMAIL }}
-      #     from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
-      - name: Debug SMTP Connection
-        run: |
-          echo "Testing DNS resolution for SMTP server"
-          nslookup ${{ secrets.SMTP_SERVER }}
-          echo "Testing connection to SMTP server"
-          nc -zv ${{ secrets.SMTP_SERVER }} ${{ secrets.SMTP_PORT }} || echo "Port unreachable"
+#       #       Repository: owner/repository
+#       #       Commit SHA: ${{ env.LATEST_COMMIT }}
+#       #       View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
+#       #     to: ${{ secrets.RECIPIENT_EMAIL }}
+#       #     from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+#       - name: Debug SMTP Connection
+#         run: |
+#           echo "Testing DNS resolution for SMTP server"
+#           nslookup ${{ secrets.SMTP_SERVER }}
+#           echo "Testing connection to SMTP server"
+#           nc -zv ${{ secrets.SMTP_SERVER }} ${{ secrets.SMTP_PORT }} || echo "Port unreachable"
 
-      - name: Send Email
-        if: env.NEW_COMMIT == 'true'
-        uses: hilarion5/send-mail@v1
-        with:
-          smtp-server: "smtp.gmail.com"
-          smtp-port: 465
-          smtp-secure: true
-          from-email: ${{ secrets.FROM_USERNAME }}
-          to-email: ${{ secrets.RECIPIENT_EMAIL }}
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "New Commit Detected in ${{ secrets.TARGET_REPO }}"
-          body: |
-            A new commit has been pushed to ${{ secrets.TARGET_REPO }}.
+#       - name: Send Email
+#         if: env.NEW_COMMIT == 'true'
+#         uses: hilarion5/send-mail@v1
+#         with:
+#           smtp-server: "smtp.gmail.com"
+#           smtp-port: 465
+#           smtp-secure: true
+#           from-email: ${{ secrets.FROM_USERNAME }}
+#           to-email: ${{ secrets.RECIPIENT_EMAIL }}
+#           username: ${{ secrets.EMAIL_USERNAME }}
+#           password: ${{ secrets.EMAIL_PASSWORD }}
+#           subject: "New Commit Detected in ${{ secrets.TARGET_REPO }}"
+#           body: |
+#             A new commit has been pushed to ${{ secrets.TARGET_REPO }}.
             
-            Repository: https://github.com/nchurchm/gitnotitest
-            Commit SHA: ${{ env.LATEST_COMMIT }}
-            View Commit: https://github.com/nchurchm/gitnotitest/commit/${{ env.LATEST_COMMIT }}
+#             Repository: https://github.com/nchurchm/gitnotitest
+#             Commit SHA: ${{ env.LATEST_COMMIT }}
+#             View Commit: https://github.com/nchurchm/gitnotitest/commit/${{ env.LATEST_COMMIT }}
 
-          html: |
-            <h1>This is a test email</h1>
-            <p>Test Paragraph</p>
+#           html: |
+#             <h1>This is a test email</h1>
+#             <p>Test Paragraph</p>
 
 
-      - name: Commit and Push Latest Commit Hash to Fork
-        if: env.NEW_COMMIT == 'true'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add latest_commit.txt
-          git commit -m "Update latest commit hash to $LATEST_COMMIT"
-          git push origin main
+#       - name: Commit and Push Latest Commit Hash to Fork
+#         if: env.NEW_COMMIT == 'true'
+#         run: |
+#           git config --global user.name "github-actions[bot]"
+#           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#           git add latest_commit.txt
+#           git commit -m "Update latest commit hash to $LATEST_COMMIT"
+#           git push origin main
       
       
-      # - name: Sync Fork with Upstream
-      #   uses: tgymnich/fork-sync@v1.3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub’s built-in token
-      #     auto_approve: true
-      #     merge_method: merge
-      #     ignore_fail: true
-      # - name: Save Latest Commit to Artifacts
-      #   uses: actions/upload-artifact@v4  # Updated to v4
-      #   with:
-      #     name: latest_commit
-      #     path: latest_commit.txt
+#       # - name: Sync Fork with Upstream
+#       #   uses: tgymnich/fork-sync@v1.3
+#       #   with:
+#       #     github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub’s built-in token
+#       #     auto_approve: true
+#       #     merge_method: merge
+#       #     ignore_fail: true
+#       # - name: Save Latest Commit to Artifacts
+#       #   uses: actions/upload-artifact@v4  # Updated to v4
+#       #   with:
+#       #     name: latest_commit
+#       #     path: latest_commit.txt
 
 
