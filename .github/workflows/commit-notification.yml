@@ -148,8 +148,8 @@ jobs:
             A new commit has been pushed to ${{ secrets.TARGET_REPO }}.
             
             Repository: https://github.com/nchurchm/gitnotitest
-            Commit SHA: "none"
-            View Commit: https://github.com/nchurchm/gitnotitest/commit/none
+            Commit SHA: ${{ env.LATEST_COMMIT }}
+            View Commit: https://github.com/nchurchm/gitnotitest/commit/${{ env.LATEST_COMMIT }}
 
           html: |
             <h1>This is a test email</h1>
@@ -166,13 +166,13 @@ jobs:
           git push origin main
       
       
-      - name: Sync Fork with Upstream
-        uses: tgymnich/fork-sync@v1.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub’s built-in token
-          auto_approve: true
-          merge_method: merge
-          ignore_fail: true
+      # - name: Sync Fork with Upstream
+      #   uses: tgymnich/fork-sync@v1.3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub’s built-in token
+      #     auto_approve: true
+      #     merge_method: merge
+      #     ignore_fail: true
       # - name: Save Latest Commit to Artifacts
       #   uses: actions/upload-artifact@v4  # Updated to v4
       #   with:
