@@ -92,8 +92,7 @@ jobs:
       - name: Sync Fork with Upstream
         uses: tgymnich/fork-sync@v1.3
         with:
-          owner: nchurchm
-          repo: gitnotitest
-          token: ${{ secrets.GITHUB_TOKEN }}
-          auto_merge: true
-          upstream_branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub’s built-in token
+          auto_approve: true
+          merge_method: merge
+          ignore_fail: true
