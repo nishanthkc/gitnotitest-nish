@@ -64,13 +64,19 @@ jobs:
       #       View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
       #     to: ${{ secrets.RECIPIENT_EMAIL }}
       #     from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
-      
+      - name: Debug SMTP Connection
+        run: |
+          echo "Testing DNS resolution for SMTP server"
+          nslookup ${{ secrets.SMTP_SERVER }}
+          echo "Testing connection to SMTP server"
+          nc -zv ${{ secrets.SMTP_SERVER }} ${{ secrets.SMTP_PORT }} || echo "Port unreachable"
+
       - name: Send Email
         if: env.NEW_COMMIT == 'true'
         uses: hilarion5/send-mail@v1
         with:
-          smtp-server: ${{ secrets.SMTP_SERVER }}
-          smtp-port: ${{ secrets.SMTP_PORT }}
+          smtp-server: "smtp.gmail.com"
+          smtp-port: 587
           smtp-secure: true
           from-email: ${{ secrets.FROM_USERNAME }}
           to-email: ${{ secrets.RECIPIENT_EMAIL }}
