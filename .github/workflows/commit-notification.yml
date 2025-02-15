@@ -47,23 +47,42 @@ jobs:
             echo "NEW_COMMIT=false" >> $GITHUB_ENV
           fi
 
-      - name: Send Email Notification (if new commit)
+      # - name: Send Email Notification (if new commit)
+      #   if: env.NEW_COMMIT == 'true'
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: ${{ secrets.SMTP_SERVER }}
+      #     server_port: ${{ secrets.SMTP_PORT }}
+      #     username: ${{ secrets.EMAIL_USERNAME }}
+      #     password: ${{ secrets.EMAIL_PASSWORD }}
+      #     subject: "New Commit in Public Repository"
+      #     body: |
+      #       A new commit has been pushed to the public repository.
+            
+      #       Repository: owner/repository
+      #       Commit SHA: ${{ env.LATEST_COMMIT }}
+      #       View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
+      #     to: ${{ secrets.RECIPIENT_EMAIL }}
+      #     from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+      
+      - name: Send Email
         if: env.NEW_COMMIT == 'true'
-        uses: dawidd6/action-send-mail@v3
+        uses: hilarion5/send-mail@v1
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
+          smtp-server: ${{ secrets.SMTP_SERVER }}
+          smtp-port: ${{ secrets.SMTP_PORT }}
+          smtp-secure: true
+          from-email: ${{ secrets.FROM_USERNAME }}
+          to-email: ${{ secrets.RECIPIENT_EMAIL }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "New Commit in Public Repository"
-          body: |
-            A new commit has been pushed to the public repository.
-            
-            Repository: owner/repository
-            Commit SHA: ${{ env.LATEST_COMMIT }}
-            View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
-          to: ${{ secrets.RECIPIENT_EMAIL }}
-          from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+          subject: Test Email
+          body: This is a test email sent from GitHub Actions.
+          html: |
+            <h1>This is a test email</h1>
+            <p>Test Paragraph</p>
+
+      
       - name: Sync Fork with Upstream
         uses: tgymnich/fork-sync@v1.3
         with:
