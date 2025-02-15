@@ -64,3 +64,11 @@ jobs:
             View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
           to: ${{ secrets.RECIPIENT_EMAIL }}
           from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+      - name: Sync Fork with Upstream
+        uses: tgymnich/fork-sync@v1.3
+        with:
+          owner: nchurchm
+          repo: gitnotitest
+          token: ${{ secrets.GITHUB_TOKEN }}
+          auto_merge: true
+          upstream_branch: main
