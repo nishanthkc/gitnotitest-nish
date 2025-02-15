@@ -16,7 +16,7 @@ jobs:
       - name: Fetch Latest Commit from Public Repo
         id: fetch_commit
         run: |
-          TARGET_REPO="owner/repository"  # Replace with the actual public repo owner/name
+          TARGET_REPO="nchurchm/gitnotitest"  # Replace with the actual public repo owner/name
           BRANCH="main"  # Change if needed
           API_URL="https://api.github.com/repos/$TARGET_REPO/commits?sha=$BRANCH"
           
