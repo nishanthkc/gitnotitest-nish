@@ -12,6 +12,19 @@ jobs:
     steps:
       - name: Checkout self
         uses: actions/checkout@v3
+        
+      - name: Check if Latest Commit Exists
+        run: |
+          if curl --fail -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/artifacts | jq -e '.artifacts | map(select(.name=="latest_commit")) | length > 0'; then
+            echo "Artifact found. Proceeding to download."
+            echo "HAS_ARTIFACT=true" >> $GITHUB_ENV
+          else
+            echo "No previous artifact found. Skipping download."
+            echo "HAS_ARTIFACT=false" >> $GITHUB_ENV
+          fi
+
 
       - name: Restore Latest Commit
         uses: actions/download-artifact@v4  # Updated to v4
