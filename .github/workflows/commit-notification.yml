@@ -42,22 +42,45 @@ jobs:
           path: latest_commit.txt
           retention-days: 7  # Keeps it for 7 days
 
+      # - name: Check for New Commit
+      #   id: check_new_commit
+      #   run: |
+      #     TRACKING_FILE="latest_commit.txt"
+
+      #     # Fetch previous commit if exists
+      #     if [ -f "$TRACKING_FILE" ]; then
+      #       PREV_COMMIT=$(cat $TRACKING_FILE)
+      #     else
+      #       PREV_COMMIT=""
+      #     fi
+
+      #     echo "Previous commit: $PREV_COMMIT"
+      #     echo "Current commit: $LATEST_COMMIT"
+
+      #     if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" ]]; then
+      #       echo "NEW_COMMIT=true" >> $GITHUB_ENV
+      #       echo "$LATEST_COMMIT" > $TRACKING_FILE
+      #     else
+      #       echo "NEW_COMMIT=false" >> $GITHUB_ENV
+      #     fi
       - name: Check for New Commit
         id: check_new_commit
         run: |
           TRACKING_FILE="latest_commit.txt"
-
-          # Fetch previous commit if exists
-          if [ -f "$TRACKING_FILE" ]; then
-            PREV_COMMIT=$(cat $TRACKING_FILE)
-          else
-            PREV_COMMIT=""
+      
+          # Ensure file exists
+          if [ ! -f "$TRACKING_FILE" ]; then
+            echo "Creating latest_commit.txt..."
+            echo "" > $TRACKING_FILE
           fi
-
+      
+          # Fetch previous commit if exists
+          PREV_COMMIT=$(cat $TRACKING_FILE)
+      
           echo "Previous commit: $PREV_COMMIT"
           echo "Current commit: $LATEST_COMMIT"
-
-          if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" ]]; then
+      
+          if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" && -n "$LATEST_COMMIT" ]]; then
             echo "NEW_COMMIT=true" >> $GITHUB_ENV
             echo "$LATEST_COMMIT" > $TRACKING_FILE
           else
