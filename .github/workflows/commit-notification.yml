@@ -76,7 +76,7 @@ jobs:
         uses: hilarion5/send-mail@v1
         with:
           smtp-server: "smtp.gmail.com"
-          smtp-port: 587
+          smtp-port: 465
           smtp-secure: true
           from-email: ${{ secrets.FROM_USERNAME }}
           to-email: ${{ secrets.RECIPIENT_EMAIL }}
