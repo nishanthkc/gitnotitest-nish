@@ -1,0 +1,66 @@
+name: Monitor Public Repository for New Commits
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'  # Runs every 10 minutes
+  workflow_dispatch:  # Allows manual execution
+
+jobs:
+  check_commits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout self
+        uses: actions/checkout@v3
+
+      - name: Fetch Latest Commit from Public Repo
+        id: fetch_commit
+        run: |
+          TARGET_REPO="owner/repository"  # Replace with the actual public repo owner/name
+          BRANCH="main"  # Change if needed
+          API_URL="https://api.github.com/repos/$TARGET_REPO/commits?sha=$BRANCH"
+          
+          LATEST_COMMIT=$(curl -s $API_URL | jq -r '.[0].sha')
+
+          echo "Latest commit: $LATEST_COMMIT"
+          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
+
+      - name: Check for New Commit
+        id: check_new_commit
+        run: |
+          TRACKING_FILE="latest_commit.txt"
+
+          # Fetch previous commit if exists
+          if [ -f "$TRACKING_FILE" ]; then
+            PREV_COMMIT=$(cat $TRACKING_FILE)
+          else
+            PREV_COMMIT=""
+          fi
+
+          echo "Previous commit: $PREV_COMMIT"
+          echo "Current commit: $LATEST_COMMIT"
+
+          if [[ "$LATEST_COMMIT" != "$PREV_COMMIT" ]]; then
+            echo "NEW_COMMIT=true" >> $GITHUB_ENV
+            echo "$LATEST_COMMIT" > $TRACKING_FILE
+          else
+            echo "NEW_COMMIT=false" >> $GITHUB_ENV
+          fi
+
+      - name: Send Email Notification (if new commit)
+        if: env.NEW_COMMIT == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "New Commit in Public Repository"
+          body: |
+            A new commit has been pushed to the public repository.
+            
+            Repository: owner/repository
+            Commit SHA: ${{ env.LATEST_COMMIT }}
+            View Commit: https://github.com/owner/repository/commit/${{ env.LATEST_COMMIT }}
+          to: ${{ secrets.RECIPIENT_EMAIL }}
+          from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
